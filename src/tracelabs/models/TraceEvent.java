@@ -1,7 +1,6 @@
 package tracelabs.models;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class TraceEvent {
@@ -30,7 +29,7 @@ public class TraceEvent {
 		public static final int NAME_INDEX = 2;
 	}
 	
-	public static void process_type(List<TraceEvent> events, String type, String name, Long id, Long timestamp) {
+	public static void process_type(List<TraceEvent> events, boolean aggregate, String type, String name, Long id, Long timestamp) {
 		String[] parts = splitNameIntoParts(name);
 		if (!isValid(parts)) {
 			return;
@@ -40,10 +39,10 @@ public class TraceEvent {
 			return;
 		}
 		
-		process(events, name, id, timestamp);
+		process(events, aggregate, name, id, timestamp);
 	}
 	
-	public static void process(List<TraceEvent> events, String name, Long id, Long timestamp) {		
+	public static void process(List<TraceEvent> events, boolean aggregate, String name, Long id, Long timestamp) {		
 		String[] parts = splitNameIntoParts(name);
 		if (!isValid(parts)) {
 			return;
@@ -64,10 +63,15 @@ public class TraceEvent {
 			return;
 		}
 				
-		TraceEvent existingEvent = events.stream()
-			.filter(event -> event.getName().equals(namePart) && event.getId() == id)
-			.findAny()
-			.orElse(null);
+		TraceEvent existingEvent = aggregate 
+				? events.stream()
+					.filter(event -> event.getName().equals(namePart))
+					.findAny()
+					.orElse(null)
+				: events.stream()
+					.filter(event -> event.getName().equals(namePart) && event.getId() == id)
+					.findAny()
+					.orElse(null);
 		
 		if (existingEvent == null) {
 			TraceEvent event = new TraceEvent(namePart, momentPart, id, timestamp);
@@ -77,7 +81,7 @@ public class TraceEvent {
 		}
 	}
 	
-	private static String get(String[] parts, String partType) {
+	protected static String get(String[] parts, String partType) {
 		switch (partType) {
 		case PartType.MOMENT_LABEL:
 			return parts[PartType.MOMENT_INDEX];
@@ -90,11 +94,11 @@ public class TraceEvent {
 		}
 	}
 	
-	private static boolean isValid(String[] parts) {
+	protected static boolean isValid(String[] parts) {
 		return parts.length >= 3;
 	}
 	
-	private static boolean isValid(String partType, String value) {
+	protected static boolean isValid(String partType, String value) {
 		switch (partType) {
 		case PartType.MOMENT_LABEL:
 			return value.equals("entry") || value.equals("exit");
@@ -106,7 +110,7 @@ public class TraceEvent {
 		}
 	}
 	
-	private static String[] splitNameIntoParts(String name) {
+	protected static String[] splitNameIntoParts(String name) {
 		return name.split("_");
 	}
 	

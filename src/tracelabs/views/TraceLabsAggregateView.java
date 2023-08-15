@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import tracelabs.models.TraceEvent;
 import tracelabs.ui.EventTable;
 
-public class TraceLabsDefaultView extends TmfView {
+public class TraceLabsAggregateView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.TraceLabsDefaultView";
 	
 	private ITmfTrace currentTrace;
@@ -29,7 +29,7 @@ public class TraceLabsDefaultView extends TmfView {
 	
 	private EventTable table;
 	
-	public TraceLabsDefaultView() {
+	public TraceLabsAggregateView() {
 		super(VIEW_ID);
 	}
 	
@@ -37,7 +37,7 @@ public class TraceLabsDefaultView extends TmfView {
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
 		
-		table = new EventTable(events);
+		table = new EventTable(events, false);
 		
 		table.createTable(parent);
 		table.updateTable();
@@ -80,7 +80,7 @@ public class TraceLabsDefaultView extends TmfView {
 				Long tid = data.getContent().getFieldValue(Long.class, "context.cpu_id");
 				Long timestamp = data.getTimestamp().toNanos();
 				
-				TraceEvent.process_type(events, false, "syscall", name, tid, timestamp);
+				TraceEvent.process_type(events, true, "syscall", name, tid, timestamp);
 			}
 			
 			@Override

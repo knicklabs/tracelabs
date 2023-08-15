@@ -13,7 +13,15 @@
             icon="icons/sample.png"
             id="tracelabs.views.TraceLabsDefaultView"
             inject="true"
-            name="TraceLabs Default View">
+            name="TraceLabs SysCall Stats">
+      </view>
+      <view
+            category="tracelabs"
+            class="tracelabs.views.TraceLabsAggregateView"
+            icon="icons/sample.png"
+            id="tracelabs.views.TraceLabsAggregateView"
+            inject="true"
+            name="TraceLabs Aggregate SysCall Stats">
       </view>
    </extension>
    <extension
@@ -22,6 +30,12 @@
             targetID="org.eclipse.jdt.ui.JavaPerspective">
          <view
                id="tracelabs.views.TraceLabsDefaultView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+         <view
+               id="tracelabs.views.TraceLabsAggregateView"
                ratio="0.5"
                relationship="right"
                relative="org.eclipse.ui.views.ProblemView">

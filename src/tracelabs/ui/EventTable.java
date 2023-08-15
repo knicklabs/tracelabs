@@ -30,12 +30,16 @@ public class EventTable {
 	private List<TraceEvent> events;
 	private TableViewer tableViewer;
 	
+	private boolean includeId = true;
+	
 	private class ColumnLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
 		public String getColumnText(Object row, int columnNumber) {
 			TraceEvent event = (TraceEvent) row;
 			
-			switch (columnNumber) {
+			int adjustedColumnNumber = includeId ? columnNumber : columnNumber + 1;
+			
+			switch (adjustedColumnNumber) {
 			case COLUMN_ID:
 				return "" + event.getId();
 			case COLUMN_NAME:
@@ -76,6 +80,12 @@ public class EventTable {
 		this.events = events;
 	}
 	
+	public EventTable(List<TraceEvent> events, boolean includeId) {
+		this.comparator = new TraceEventComparator();
+		this.events = events;
+		this.includeId = includeId;
+	}
+	
 	public void createTable(Composite parent) {		
 		tableViewer = new TableViewer(parent);
 		tableViewer.setLabelProvider(new ColumnLabelProvider());
@@ -86,15 +96,17 @@ public class EventTable {
 		
 		TableColumn column;
 		
-		column = new TableColumn(table, SWT.LEFT);
-		column.setText("ID");
-		column.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				comparator.sortOn(TraceEventComparator.FIELD_ID);
-				Collections.sort(events, comparator);
-				updateTable();
-			}
-		});
+		if (this.includeId) {
+			column = new TableColumn(table, SWT.LEFT);
+			column.setText("ID");
+			column.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					comparator.sortOn(TraceEventComparator.FIELD_ID);
+					Collections.sort(events, comparator);
+					updateTable();
+				}
+			});	
+		}
 		
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText("Name");
