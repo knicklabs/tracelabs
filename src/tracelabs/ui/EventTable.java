@@ -1,5 +1,6 @@
 package tracelabs.ui;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -8,6 +9,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -15,13 +18,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import tracelabs.models.TraceEvent;
+import tracelabs.models.TraceEventComparator;
 
 public class EventTable {
 	private static final int COLUMN_ID = 0;
 	private static final int COLUMN_NAME = 1;
 	private static final int COLUMN_CALLS = 2;
 	private static final int COLUMN_DURATION = 3;
-	
+		
+	private TraceEventComparator comparator;
+	private List<TraceEvent> events;
 	private TableViewer tableViewer;
 	
 	private class ColumnLabelProvider extends LabelProvider implements ITableLabelProvider {
@@ -65,7 +71,12 @@ public class EventTable {
 		public void inputChanged(Viewer viewer, Object previousInput, Object nextInput) {}
 	}
 	
-	public void createTable(Composite parent) {
+	public EventTable(List<TraceEvent> events) {
+		this.comparator = new TraceEventComparator();
+		this.events = events;
+	}
+	
+	public void createTable(Composite parent) {		
 		tableViewer = new TableViewer(parent);
 		tableViewer.setLabelProvider(new ColumnLabelProvider());
 		tableViewer.setContentProvider(new ColumnContentProvider());
@@ -77,21 +88,49 @@ public class EventTable {
 		
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText("ID");
+		column.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				comparator.sortOn(TraceEventComparator.FIELD_ID);
+				Collections.sort(events, comparator);
+				updateTable();
+			}
+		});
 		
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText("Name");
+		column.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				comparator.sortOn(TraceEventComparator.FIELD_NAME);
+				Collections.sort(events, comparator);
+				updateTable();
+			}
+		});
 		
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText("Calls");
+		column.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				comparator.sortOn(TraceEventComparator.FIELD_CALLS);
+				Collections.sort(events, comparator);
+				updateTable();
+			}
+		});
 		
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText("Average Duration");
+		column.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				comparator.sortOn(TraceEventComparator.FIELD_DURATION);
+				Collections.sort(events, comparator);
+				updateTable();
+			}
+		});
 		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 	}
 	
-	public void updateTable(List<TraceEvent> events) {		
+	public void updateTable() {		
 		tableViewer.setInput(events);
 		
 		Table table = tableViewer.getTable();

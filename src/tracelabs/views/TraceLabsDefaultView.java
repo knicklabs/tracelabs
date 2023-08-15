@@ -37,10 +37,10 @@ public class TraceLabsDefaultView extends TmfView {
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
 		
-		table = new EventTable();
+		table = new EventTable(events);
 		
 		table.createTable(parent);
-		table.updateTable(events);
+		table.updateTable();
 		
 		TmfTraceManager traceManager = TmfTraceManager.getInstance();
         ITmfTrace trace = traceManager.getActiveTrace();
@@ -92,7 +92,7 @@ public class TraceLabsDefaultView extends TmfView {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						table.updateTable(events);
+						table.updateTable();
 					}
 				});
 			}
