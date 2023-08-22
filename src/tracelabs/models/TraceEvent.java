@@ -1,7 +1,9 @@
 package tracelabs.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TraceEvent {
 	/**
@@ -44,6 +46,10 @@ public class TraceEvent {
 	
 	/** Each observed exit of this event. */
 	private List<Observation> exits = new ArrayList<Observation>();
+	
+	/** Each observed performance counter on this event. */
+	private List<Map<String, Long>> performanceCountersOnEntry = new ArrayList<Map<String, Long>>();
+	private List<Map<String, Long>> performanceCountersOnExit = new ArrayList<Map<String, Long>>();
 	
 	/**
 	 * Create a new instance of the TraceEvent.
@@ -97,21 +103,39 @@ public class TraceEvent {
 	}
 	
 	/**
-	 * Get the last observed exit from this event.
+	 * Get the last observed entry from this event.
 	 * 
-	 * @return	The last observed exit.
+	 * @return	The last observed entry.
 	 */
 	public long lastEntry() {
 		return this.entries.get(this.entries.size() - 1).getTimestamp();
 	}
 	
 	/**
-	 * Get the last observed entry from this event.
+	 * Get the last observed exit from this event.
 	 * 
-	 * @return	The last observed entry.
+	 * @return	The last observed exit.
 	 */
 	public long lastExit() {
 		return this.exits.get(this.exits.size() - 1).getTimestamp();
+	}
+	
+	/**
+	 * Get the last observed performance counters on entry from this event.
+	 * 
+	 * @return The last observed performance counters.
+	 */
+	public Map<String, Long> lastPerformanceCountersOnEntry() {
+		return this.performanceCountersOnEntry.get(this.performanceCountersOnEntry.size() - 1);
+	}
+	
+	/**
+	 * Get the last observed performance counters on exit from this event.
+	 * 
+	 * @return The last observed performance counters.
+	 */
+	public Map<String, Long> lastPerformanceCountersOnExit() {
+		return this.performanceCountersOnExit.get(this.performanceCountersOnExit.size() - 1);
 	}
 	
 	/**
@@ -131,12 +155,36 @@ public class TraceEvent {
 	 */
 	public void observeExit(long timestamp) throws InvalidObservation {
 		// Occassionally we get an exit without an entry so we should guard against that.
-		if (entries.size() - exits.size() == 1) {
-			exits.add(new Observation(timestamp));
-			durations.add(lastExit() - lastEntry());
-		} else {
-			throw new InvalidObservation("Unmatched exit observed for name: " + name + ", entries: " + entries.size() + ", exits: " + exits.size());
+		// This seams to always happen on first occurence, i.e. entries = 0, exits = 1, so
+		// likely this is because an entry happened before the trace started.
+		if (entries.size() - exits.size() != 1) {
+			throw new InvalidObservation("Unmatched exit (count) observed for id: " + id + ", name: " + name + ", entries: " + entries.size() + ", exits: " + (exits.size() + 1));
 		}
+		
+		if (timestamp < lastEntry()) {
+			throw new InvalidObservation("Unmatched exit (timestamp) observed for id: " + id + ", name: " + name + ", entry: " + lastEntry() + ", exit: " + timestamp);
+		}
+		
+		exits.add(new Observation(timestamp));
+		durations.add(lastExit() - lastEntry());
+	}
+	
+	/**
+	 * Observe performance counters observed on entry of event.
+	 * 
+	 * @param performanceCounters	The observed performance counters.
+	 */
+	public void observePerformanceCountersOnEntry(Map<String, Long> performanceCounters) {
+		performanceCountersOnEntry.add(performanceCounters);
+	}
+	
+	/**
+	 * Observe performance counters observed on exit of event.
+	 * 
+	 * @param performanceCounters
+	 */
+	public void observePerformanceCountersOnExit(Map<String, Long> performanceCounters) {
+		performanceCountersOnExit.add(performanceCounters);
 	}
 	
 	/**

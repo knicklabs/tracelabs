@@ -23,6 +23,14 @@
             inject="true"
             name="TraceLabs Aggregate SysCall Stats">
       </view>
+      <view
+            category="tracelabs"
+            class="tracelabs.views.TraceLabsPerformanceCountersView"
+            icon="icons/sample.png"
+            id="tracelabs.views.TraceLabsPerformanceCountersView"
+            inject="true"
+            name="TraceLabs Performance Counters">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

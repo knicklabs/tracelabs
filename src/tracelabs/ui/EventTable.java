@@ -232,15 +232,17 @@ public class EventTable {
 			}
 		});
 		
-		column = new TableColumn(table, SWT.LEFT);
-		column.setText("Total Duration");
-		column.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				comparator.sortOn(COLUMN_TOTAL_DURATION);
-				Collections.sort(rows, comparator);
-				updateTable();
-			}
-		});
+		if (this.includeId) {
+			column = new TableColumn(table, SWT.LEFT);
+			column.setText("Total Duration");
+			column.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					comparator.sortOn(COLUMN_TOTAL_DURATION);
+					Collections.sort(rows, comparator);
+					updateTable();
+				}
+			});	
+		}
 		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);

@@ -2,7 +2,10 @@ package tracelabs.models;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
@@ -106,8 +109,6 @@ public class TraceEventCollection {
 				
 		
 		Long tid = Long.valueOf(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(rawEvent.getTrace(), LinuxTidAspect.class, rawEvent));
-		System.out.println(namePart + " " + momentPart + " " + tid);
-		
 		Long timestamp = rawEvent.getTimestamp().toNanos();
 		
 		TraceEvent event = events
@@ -123,12 +124,24 @@ public class TraceEventCollection {
 			event = new TraceEvent(tid, namePart);
 		}
 		
-		if (momentPart.equals("entry")) {
-			event.observeEntry(timestamp);
-		} else if (momentPart.equals("exit")) {
-			event.observeExit(timestamp);
+		Collection<String> fields = rawEvent.getContent().getFieldNames();
+		List<String> performanceCounterFields = fields.stream().filter(f -> f.startsWith("context._perf_cpu_")).collect(Collectors.toList());
+		
+		Map<String, Long> performanceCounters = new HashMap<String, Long>();
+		
+		for (String field : performanceCounterFields) {
+			performanceCounters.put(field.split("context._perf_cpu_")[1], rawEvent.getContent().getFieldValue(Long.class, field));
 		}
 		
+		if (momentPart.equals("entry")) {
+			event.observeEntry(timestamp);
+			event.observePerformanceCountersOnEntry(performanceCounters);
+			
+		} else if (momentPart.equals("exit")) {
+			event.observeExit(timestamp);
+			event.observePerformanceCountersOnExit(performanceCounters);
+		}
+				
 		if (shouldInsert) {
 			events.add(event);
 		}
