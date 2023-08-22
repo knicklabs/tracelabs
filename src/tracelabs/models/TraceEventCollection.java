@@ -134,12 +134,10 @@ public class TraceEventCollection {
 		}
 		
 		if (momentPart.equals("entry")) {
-			event.observeEntry(timestamp);
-			event.observePerformanceCountersOnEntry(performanceCounters);
+			event.observeEntry(timestamp, performanceCounters);
 			
 		} else if (momentPart.equals("exit")) {
-			event.observeExit(timestamp);
-			event.observePerformanceCountersOnExit(performanceCounters);
+			event.observeExit(timestamp, performanceCounters);
 		}
 				
 		if (shouldInsert) {

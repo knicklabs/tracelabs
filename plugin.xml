@@ -31,6 +31,14 @@
             inject="true"
             name="TraceLabs Performance Counters">
       </view>
+      <view
+            category="tracelabs"
+            class="tracelabs.views.TraceLabsPerformanceCountersChartView"
+            icon="icons/sample.png"
+            id="tracelabs.views.TraceLabsPerformanceCountersChartView"
+            inject="true"
+            name="TraceLabs Performance Counters Chart">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

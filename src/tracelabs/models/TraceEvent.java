@@ -21,10 +21,16 @@ public class TraceEvent {
 	 * An Observation of a TraceEvent.
 	 */
 	class Observation {
+		private Map<String, Long> performanceCounters;
 		private long timestamp;
 		
-		public Observation(long timestamp) {
+		public Observation(long timestamp, Map<String, Long> performanceCounters) {
+			this.performanceCounters = performanceCounters;
 			this.timestamp = timestamp;
+		}
+		
+		public Map<String, Long> getPerformanceCounters() {
+			return performanceCounters;
 		}
 		
 		public long getTimestamp() {
@@ -46,10 +52,6 @@ public class TraceEvent {
 	
 	/** Each observed exit of this event. */
 	private List<Observation> exits = new ArrayList<Observation>();
-	
-	/** Each observed performance counter on this event. */
-	private List<Map<String, Long>> performanceCountersOnEntry = new ArrayList<Map<String, Long>>();
-	private List<Map<String, Long>> performanceCountersOnExit = new ArrayList<Map<String, Long>>();
 	
 	/**
 	 * Create a new instance of the TraceEvent.
@@ -126,7 +128,7 @@ public class TraceEvent {
 	 * @return The last observed performance counters.
 	 */
 	public Map<String, Long> lastPerformanceCountersOnEntry() {
-		return this.performanceCountersOnEntry.get(this.performanceCountersOnEntry.size() - 1);
+		return this.entries.get(this.entries.size() - 1).getPerformanceCounters();
 	}
 	
 	/**
@@ -135,25 +137,27 @@ public class TraceEvent {
 	 * @return The last observed performance counters.
 	 */
 	public Map<String, Long> lastPerformanceCountersOnExit() {
-		return this.performanceCountersOnExit.get(this.performanceCountersOnExit.size() - 1);
+		return this.exits.get(this.exits.size() - 1).getPerformanceCounters();
 	}
 	
 	/**
 	 * Observe an entry of this event.
 	 * 
 	 * @param timestamp	The timestamp of entry.
+	 * @param performanceCounters The performance counters recorded at entry.
 	 */
-	public void observeEntry(long timestamp) {
-		entries.add(new Observation(timestamp));
+	public void observeEntry(long timestamp, Map<String, Long> performanceCounters) {
+		entries.add(new Observation(timestamp, performanceCounters));
 	}
 	
 	/**
 	 * Observe an exit of this event. This also computes a duration.
 	 * 
 	 * @param timestamp	The timestamp of exit.
+	 * @param performanceCounters The performance counters recorded at exit.
 	 * @throws InvalidObservation
 	 */
-	public void observeExit(long timestamp) throws InvalidObservation {
+	public void observeExit(long timestamp, Map<String, Long> performanceCounters) throws InvalidObservation {
 		// Occassionally we get an exit without an entry so we should guard against that.
 		// This seams to always happen on first occurence, i.e. entries = 0, exits = 1, so
 		// likely this is because an entry happened before the trace started.
@@ -165,26 +169,8 @@ public class TraceEvent {
 			throw new InvalidObservation("Unmatched exit (timestamp) observed for id: " + id + ", name: " + name + ", entry: " + lastEntry() + ", exit: " + timestamp);
 		}
 		
-		exits.add(new Observation(timestamp));
+		exits.add(new Observation(timestamp, performanceCounters));
 		durations.add(lastExit() - lastEntry());
-	}
-	
-	/**
-	 * Observe performance counters observed on entry of event.
-	 * 
-	 * @param performanceCounters	The observed performance counters.
-	 */
-	public void observePerformanceCountersOnEntry(Map<String, Long> performanceCounters) {
-		performanceCountersOnEntry.add(performanceCounters);
-	}
-	
-	/**
-	 * Observe performance counters observed on exit of event.
-	 * 
-	 * @param performanceCounters
-	 */
-	public void observePerformanceCountersOnExit(Map<String, Long> performanceCounters) {
-		performanceCountersOnExit.add(performanceCounters);
 	}
 	
 	/**
