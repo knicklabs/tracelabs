@@ -1,6 +1,8 @@
 package tracelabs.ui;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -18,36 +20,135 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import tracelabs.models.TraceEvent;
-import tracelabs.models.TraceEventComparator;
+import tracelabs.models.TraceEventAggregate;
+import tracelabs.models.TraceEventCollection;
 
 public class EventTable {
 	private static final int COLUMN_ID = 0;
 	private static final int COLUMN_NAME = 1;
 	private static final int COLUMN_CALLS = 2;
-	private static final int COLUMN_DURATION = 3;
+	private static final int COLUMN_AVERAGE_DURATION = 3;
+	private static final int COLUMN_TOTAL_DURATION = 4;
+	
+	public class Row {
+		private long id = -1;
+		private String name = "";
+		private int numCalls = 0;
+		private long averageDuration = 0;
+		private long totalDuration = 0;
 		
-	private TraceEventComparator comparator;
-	private List<TraceEvent> events;
+		public long getId() {
+			return id;
+		}
+		
+		public void setId(long id) {
+			this.id = id;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public int getNumCalls() {
+			return numCalls;
+		}
+		
+		public void setNumCalls(int numCalls) {
+			this.numCalls = numCalls;
+		}
+		
+		public long getAverageDuration() {
+			return averageDuration;
+		}
+		
+		public void setAverageDuration(long averageDuration) {
+			this.averageDuration = averageDuration;
+		}
+		
+		public long getTotalDuration() {
+			return totalDuration;
+		}
+		
+		public void setTotalDuration(long totalDuration) {
+			this.totalDuration = totalDuration;
+		}
+	}
+	
+	public class RowComparator implements Comparator<Row> {		
+		private static final int ASCENDING = 0;
+		private static final int DESCENDING = 1;
+		
+		private int field;
+		
+		private int direction;
+		
+		@Override
+		public int compare(Row a, Row b) {
+			int result = 0;
+			
+			switch (field) {
+			case COLUMN_ID:
+				result = a.getId() > b.getId() ? 1 : -1;
+				break;
+			case COLUMN_NAME:
+				result = a.getName().compareTo(b.getName());
+				break;
+			case COLUMN_CALLS:
+				result = a.getNumCalls() > b.getNumCalls() ? 1 : -1;
+				break;
+			case COLUMN_AVERAGE_DURATION:
+				result = a.getAverageDuration() > b.getAverageDuration() ? 1 : -1;
+				break;
+			case COLUMN_TOTAL_DURATION:
+				result = a.getTotalDuration() > b.getTotalDuration() ? 1 : -1;
+				break;
+			}
+			
+			if (direction == DESCENDING) {
+				result = -1 * result;
+			}
+			
+			return result;
+		}
+		
+		public void sortOn(int field) {
+			if (field == this.field) {
+				direction = direction == DESCENDING ? ASCENDING : DESCENDING;
+			} else {
+				this.field = field;
+				direction = ASCENDING;
+			}
+		}
+	}
+		
+	private RowComparator comparator = new RowComparator();
+	private List<Row> rows = new ArrayList<Row>();
 	private TableViewer tableViewer;
 	
 	private boolean includeId = true;
 	
 	private class ColumnLabelProvider extends LabelProvider implements ITableLabelProvider {
 		@Override
-		public String getColumnText(Object row, int columnNumber) {
-			TraceEvent event = (TraceEvent) row;
+		public String getColumnText(Object data, int columnNumber) {
+			Row row = (Row) data;
 			
-			int adjustedColumnNumber = includeId ? columnNumber : columnNumber + 1;
+			int adjustedColumnNumber = row.getId() >= 0 ? columnNumber : columnNumber + 1;
 			
 			switch (adjustedColumnNumber) {
 			case COLUMN_ID:
-				return "" + event.getId();
+				return "" + row.getId();
 			case COLUMN_NAME:
-				return event.getName();
+				return row.getName();
 			case COLUMN_CALLS:
-				return "" + event.getNumCalls();
-			case COLUMN_DURATION:
-				return "" + event.getAverageDuration();
+				return "" + row.getNumCalls();
+			case COLUMN_AVERAGE_DURATION:
+				return "" + row.getAverageDuration();
+			case COLUMN_TOTAL_DURATION:
+				return "" + row.getTotalDuration();
 			default:
 				return "";
 			}
@@ -75,14 +176,7 @@ public class EventTable {
 		public void inputChanged(Viewer viewer, Object previousInput, Object nextInput) {}
 	}
 	
-	public EventTable(List<TraceEvent> events) {
-		this.comparator = new TraceEventComparator();
-		this.events = events;
-	}
-	
-	public EventTable(List<TraceEvent> events, boolean includeId) {
-		this.comparator = new TraceEventComparator();
-		this.events = events;
+	public EventTable(boolean includeId) {
 		this.includeId = includeId;
 	}
 	
@@ -101,8 +195,8 @@ public class EventTable {
 			column.setText("ID");
 			column.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					comparator.sortOn(TraceEventComparator.FIELD_ID);
-					Collections.sort(events, comparator);
+					comparator.sortOn(COLUMN_ID);
+					Collections.sort(rows, comparator);
 					updateTable();
 				}
 			});	
@@ -112,8 +206,8 @@ public class EventTable {
 		column.setText("Name");
 		column.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				comparator.sortOn(TraceEventComparator.FIELD_NAME);
-				Collections.sort(events, comparator);
+				comparator.sortOn(COLUMN_NAME);
+				Collections.sort(rows, comparator);
 				updateTable();
 			}
 		});
@@ -122,8 +216,8 @@ public class EventTable {
 		column.setText("Calls");
 		column.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				comparator.sortOn(TraceEventComparator.FIELD_CALLS);
-				Collections.sort(events, comparator);
+				comparator.sortOn(COLUMN_CALLS);
+				Collections.sort(rows, comparator);
 				updateTable();
 			}
 		});
@@ -132,8 +226,18 @@ public class EventTable {
 		column.setText("Average Duration");
 		column.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				comparator.sortOn(TraceEventComparator.FIELD_DURATION);
-				Collections.sort(events, comparator);
+				comparator.sortOn(COLUMN_AVERAGE_DURATION);
+				Collections.sort(rows, comparator);
+				updateTable();
+			}
+		});
+		
+		column = new TableColumn(table, SWT.LEFT);
+		column.setText("Total Duration");
+		column.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				comparator.sortOn(COLUMN_TOTAL_DURATION);
+				Collections.sort(rows, comparator);
 				updateTable();
 			}
 		});
@@ -142,8 +246,8 @@ public class EventTable {
 		table.setLinesVisible(true);
 	}
 	
-	public void updateTable() {		
-		tableViewer.setInput(events);
+	public void updateTable() {
+		tableViewer.setInput(rows);
 		
 		Table table = tableViewer.getTable();
 		for (int i = 0, n = table.getColumnCount(); i < n; i++) {
@@ -151,5 +255,41 @@ public class EventTable {
 		}
 		
 		tableViewer.refresh();
-	}	
+	}
+	
+	public void updateTable(TraceEventCollection collection) {
+		rows.clear();
+		
+		if (includeId) {
+			eventsToRows(collection.getEvents());
+		} else {
+			collection.aggregate();
+			aggregateEventsToRows(collection.getAggregateEvents());
+		}
+		
+		updateTable();
+	}
+	
+	private void eventsToRows(List<TraceEvent> events) {
+		for (TraceEvent event : events) {
+			Row row = new Row();
+			row.setId(event.getId());
+			row.setName(event.getName());
+			row.setNumCalls(event.numObservations());
+			row.setAverageDuration(event.averageDuration());
+			row.setTotalDuration(event.totalDuration());
+			rows.add(row);
+		}
+	}
+	
+	private void aggregateEventsToRows(List<TraceEventAggregate> events) {		
+		for (TraceEventAggregate event : events) {
+			Row row = new Row();
+			row.setName(event.getName());
+			row.setNumCalls(event.getNumObservations());
+			row.setAverageDuration(event.getAverageDuration());
+			row.setTotalDuration(event.getTotalDuration());
+			rows.add(row);
+		}
+	}
 }

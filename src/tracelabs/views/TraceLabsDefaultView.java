@@ -1,8 +1,5 @@
 package tracelabs.views;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -17,7 +14,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
-import tracelabs.models.TraceEvent;
+import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.EventTable;
 
 public class TraceLabsDefaultView extends TmfView {
@@ -25,20 +22,24 @@ public class TraceLabsDefaultView extends TmfView {
 	
 	private ITmfTrace currentTrace;
 	
-	private List<TraceEvent> events = new ArrayList<TraceEvent>();
-	
+	private TraceEventCollection collection = new TraceEventCollection();
 	private EventTable table;
+	
+	protected boolean includeId = true;
 	
 	public TraceLabsDefaultView() {
 		super(VIEW_ID);
+	}
+	
+	public TraceLabsDefaultView(String viewId) {
+		super(viewId);
 	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new GridLayout(1, false));
 		
-		table = new EventTable(events);
-		
+		table = new EventTable(includeId);
 		table.createTable(parent);
 		table.updateTable();
 		
@@ -62,7 +63,7 @@ public class TraceLabsDefaultView extends TmfView {
 			return;
 		}
 		
-		events.clear();
+		collection.reset();
 		
 		currentTrace = signal.getTrace();
 		
@@ -71,28 +72,27 @@ public class TraceLabsDefaultView extends TmfView {
                 ITmfEventRequest.ExecutionType.BACKGROUND) {
 			
 			@Override
-			public void handleData(ITmfEvent data) {
-				
+			public void handleData(ITmfEvent data) {								
 				// Called for each event
 				super.handleData(data);
 				
-				String name = data.getName();
-				Long tid = data.getContent().getFieldValue(Long.class, "context.cpu_id");
-				Long timestamp = data.getTimestamp().toNanos();
-				
-				TraceEvent.process_type(events, false, "syscall", name, tid, timestamp);
+				try {
+					collection.process(data);		
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 			}
 			
 			@Override
 			public void handleSuccess() {				
-				// Request successful, not more data available
+				// Request successful, no more data available
 				super.handleSuccess();
 				
 				// Update UI in the UI thread.
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						table.updateTable();
+						table.updateTable(collection);
 					}
 				});
 			}
