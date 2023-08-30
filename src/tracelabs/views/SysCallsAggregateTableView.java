@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.EventTable;
 
-public class TraceLabsAggregateView extends TmfView {
+public class SysCallsAggregateTableView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.TraceLabsAggregateView";
 	
 	private ITmfTrace currentTrace;
@@ -27,7 +27,7 @@ public class TraceLabsAggregateView extends TmfView {
 	
 	protected boolean includeId = false;
 	
-	public TraceLabsAggregateView() {
+	public SysCallsAggregateTableView() {
 		super(VIEW_ID);
 	}
 	

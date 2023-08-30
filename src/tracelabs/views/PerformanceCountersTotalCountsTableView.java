@@ -1,17 +1,8 @@
 package tracelabs.views;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IBarSeries;
-import org.eclipse.swtchart.ICircularSeries;
-import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -23,11 +14,10 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
-import tracelabs.models.TraceEventAggregate;
 import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.PerformanceCountersTable;
 
-public class TraceLabsPerformanceCountersChartView extends TmfView {
+public class PerformanceCountersTotalCountsTableView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.TraceLabsPerformanceCountersView";
 	
 	private ITmfTrace currentTrace;
@@ -35,19 +25,19 @@ public class TraceLabsPerformanceCountersChartView extends TmfView {
 	private TraceEventCollection collection = new TraceEventCollection();
 	private PerformanceCountersTable table;
 	
-	private Chart chart;
+	protected boolean includeId = true;
 	
-	Composite pane;
-	
-	public TraceLabsPerformanceCountersChartView() {
+	public PerformanceCountersTotalCountsTableView() {
 		super(VIEW_ID);
 	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		pane = parent;
-		// parent.setLayout(new GridLayout(1, false));
+		parent.setLayout(new GridLayout(1, false));
 		
+		table = new PerformanceCountersTable();
+		table.createTable(parent);
+		table.updateTable();
 		
 		TmfTraceManager traceManager = TmfTraceManager.getInstance();
         ITmfTrace trace = traceManager.getActiveTrace();
@@ -98,40 +88,7 @@ public class TraceLabsPerformanceCountersChartView extends TmfView {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						collection.aggregate();
-						List<TraceEventAggregate> events = collection.getAggregateEvents();
-						TraceEventAggregate event = events.get(events.size() - 1);
-						Map<String, Long> performanceCounters = event.getPerformanceCounters();
-						List<String> labels = new ArrayList<String>();
-						List<Double> values = new ArrayList<Double>();
-						
-						for (Map.Entry<String, Long> entry : performanceCounters.entrySet()) {
-							labels.add(entry.getKey());
-							values.add(entry.getValue().doubleValue());
-						}
-						
-						String[] labelArray = labels.toArray(new String[0]);
-						double[] valueArray = new double[values.size()];
-						
-						for (int i = 0; i < values.size(); i++) {
-							valueArray[i] = (double) values.get(i);
-						}
-						
-						chart = new Chart(pane, SWT.NONE);
-						chart.getTitle().setText("Performance Counters");
-						chart.getAxisSet().getXAxis(0).getTitle().setText("Performance Counters");
-						chart.getAxisSet().getYAxis(0).getTitle().setText("Count");
-						
-						chart.getAxisSet().getXAxis(0).enableCategory(true);
-						chart.getAxisSet().getXAxis(0).setCategorySeries(new String[]{});
-						
-						chart.getAxisSet().getXAxis(0).enableCategory(true);
-						chart.getAxisSet().getXAxis(0).setCategorySeries(labelArray);
-						
-						IBarSeries<?> barSeries1 = (IBarSeries<?>) chart.getSeriesSet().createSeries(SeriesType.BAR, "totals");
-						barSeries1.setYSeries(valueArray);
-						
-						chart.getAxisSet().adjustRange();
+						table.updateTable(collection);
 					}
 				});
 			}

@@ -9,35 +9,35 @@
       </category>
       <view
             category="tracelabs"
-            class="tracelabs.views.TraceLabsDefaultView"
+            class="tracelabs.views.SysCallsTableView"
             icon="icons/sample.png"
-            id="tracelabs.views.TraceLabsDefaultView"
+            id="tracelabs.views.SysCallsTableView"
             inject="true"
-            name="TraceLabs SysCall Stats">
+            name="SysCalls - Table">
       </view>
       <view
             category="tracelabs"
-            class="tracelabs.views.TraceLabsAggregateView"
+            class="tracelabs.views.SysCallsAggregateTableView"
             icon="icons/sample.png"
-            id="tracelabs.views.TraceLabsAggregateView"
+            id="tracelabs.views.SysCallsAggregateTableView"
             inject="true"
-            name="TraceLabs Aggregate SysCall Stats">
+            name="SysCalls - Aggregated Table">
       </view>
       <view
             category="tracelabs"
-            class="tracelabs.views.TraceLabsPerformanceCountersView"
+            class="tracelabs.views.PerformanceCountersTotalCountsTableView"
             icon="icons/sample.png"
-            id="tracelabs.views.TraceLabsPerformanceCountersView"
+            id="tracelabs.views.PerformanceCountersTotalCountsTableView"
             inject="true"
-            name="TraceLabs Performance Counters">
+            name="Performance Counters - Total Table">
       </view>
       <view
             category="tracelabs"
-            class="tracelabs.views.TraceLabsPerformanceCountersChartView"
+            class="tracelabs.views.PerformanceCountersTotalCountsView"
             icon="icons/sample.png"
-            id="tracelabs.views.TraceLabsPerformanceCountersChartView"
+            id="tracelabs.views.PerformanceCountersTotalCountsView"
             inject="true"
-            name="TraceLabs Performance Counters Chart">
+            name="Performance Counters - Total Viz">
       </view>
    </extension>
    <extension
