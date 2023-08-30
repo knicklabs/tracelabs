@@ -39,6 +39,14 @@
             inject="true"
             name="Performance Counters - Total Viz">
       </view>
+      <view
+            category="tracelabs"
+            class="tracelabs.views.PerformanceCountersGrowthView"
+            icon="icons/sample.png"
+            id="tracelabs.views.PerformanceCountersGrowthView"
+            inject="true"
+            name="Performance Counters - Growth Viz">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

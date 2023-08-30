@@ -26,6 +26,25 @@ public class PerformanceCounters {
 	List<Entry> entries = new ArrayList<Entry>();
 	
 	public void update(Long timestamp, Map<String, Long> counters) {
+		if (entries.size() == 0) {
+			entries.add(new Entry(timestamp, counters));	
+		}
+		
+		Entry lastEntry = entries.get(entries.size() - 1);
+		Map<String, Long> lastCounters = lastEntry.getCounters();
+		
+		for (Map.Entry<String, Long> lastCounter : lastCounters.entrySet()) {
+			String key = lastCounter.getKey();
+			Long value = lastCounter.getValue();
+			
+			Long nextValue = counters.get(key);
+			if (nextValue == null) {
+				// Do nothing
+			} else {
+				counters.replace(key, value + nextValue);
+			}
+		}
+		
 		entries.add(new Entry(timestamp, counters));
 	}
 	

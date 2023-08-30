@@ -2,9 +2,13 @@ package tracelabs.views;
 
 import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ILineSeries;
+import org.eclipse.swtchart.LineStyle;
+import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -16,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
-import tracelabs.models.TraceEventAggregate;
+import tracelabs.models.PerformanceCounters;
 import tracelabs.models.TraceEventCollection;
 
 public class PerformanceCountersGrowthView extends TmfView {
@@ -86,11 +90,41 @@ public class PerformanceCountersGrowthView extends TmfView {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						collection.aggregate();
-						List<TraceEventAggregate> events = collection.getAggregateEvents();
+						PerformanceCounters performanceCounters = collection.getPerformanceCounters();
+						
+						chart = new Chart(pane, SWT.NONE);
+						chart.getTitle().setText("Performance Counters over Time");
+						chart.getAxisSet().getXAxis(0).getTitle().setText("Timestamp");
+						chart.getAxisSet().getYAxis(0).getTitle().setText("Count");
+						
+						double[] timestamps = performanceCounters.getTimestampSeries();
+						List<String> counters = performanceCounters.getCounters();
+						System.out.println("timestamps " + timestamps.length);
+						System.out.println("counters " + counters.size());
+						
+						int[] colors = new int[] { SWT.COLOR_BLUE, SWT.COLOR_RED, SWT.COLOR_GREEN, SWT.COLOR_DARK_YELLOW };
+						
+						for (int i = 0; i < counters.size(); i++) {
+							String counter = counters.get(i);
+							
+							ILineSeries<?> lineSeries = (ILineSeries<?>)chart.getSeriesSet().createSeries(SeriesType.LINE, counter);
+
+							
+							lineSeries.setXSeries(timestamps);
+							lineSeries.setYSeries(performanceCounters.getCounterSeries(counter));
+							lineSeries.setLineColor(pane.getDisplay().getSystemColor(colors[i % colors.length]));
+							lineSeries.setSymbolColor(pane.getDisplay().getSystemColor(colors[i % colors.length]));
+							lineSeries.setSymbolSize(2);
+							lineSeries.setLineStyle(LineStyle.DOT);
+						}
+						
+						chart.getAxisSet().adjustRange();
+						chart.redraw();
 					}
 				});
 			}
 		};
+		
+		currentTrace.sendRequest(req);
 	}
 }

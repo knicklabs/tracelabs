@@ -89,6 +89,10 @@ public class TraceEventCollection {
 		return events;
 	}
 	
+	public PerformanceCounters getPerformanceCounters() {
+		return performanceCounters;
+	}
+	
 	public void process(ITmfEvent rawEvent) throws InvalidObservation {		
 		String[] parts = splitNameIntoParts(rawEvent.getName());
 		if (!isValid(parts)) {
