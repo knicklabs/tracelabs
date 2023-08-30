@@ -36,3 +36,20 @@ Note: Eclipse Marketplace can be accessed from `Help > Eclipse Marketplace` in t
 12. From the `Show View` modal window, select `TraceLabs Aggregate SysCall Stats`, `TraceLabs Performance Counters`, `TraceLabs Performance Counters Chart`, and `TraceLabs SysCall Stats`.
 
 After following all those steps, you should be able to see all of the views under development in the Trace Labs project.
+
+
+## Collecting Traces
+
+To collect traces compatible with this plug-in, you will need to run a program such as LTTng or Perf on a compatible Linux operating system. You will need to collect syscall events with fields for process id, thread id, and one or more performance counters. The resulting trace must be in Common Trace Format (CTF).
+
+Here's an example script for using LTTng to trace syscall events on the Linux kernel while executing a `wget` command with all of the context required by this plug-in:
+
+1. Run `lttng create` to create a new tracing session.
+2. Run `lttng enable-event -k --syscall` to create a tracing rule that will capture all Linux kernel syscall events.
+3. Run `lttng add-context --kernel --type=pid --type=tid` to add context fields to each event for the process id (pid) and thread id (tid).
+4. Run `lttng add-context --kernel --type=perf:cpu:cpu-cycles --type=perf:cpu:cycles --type=perf:cpu:branch-instructions --type=perf:cpu:branch-misses` to add context fields to each event for performance counters.
+5. Run `lttng start` to start tracing.
+6. Execute a program and trace syscalls on the Linux kernel, i.e. `wget https://lttng.org`.
+7. Run `lttng destroy` to stop tracing, destroy the tracing session, and write the results to disk in Common Trace Format (CTF).
+
+Note: you can see all of the context that you can add to an event by running `lttng add-context --list`, this includes all performance counters. You cannot add context for more than four performance counters at a time.
