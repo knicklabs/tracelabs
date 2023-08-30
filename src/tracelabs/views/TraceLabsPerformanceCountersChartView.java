@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IBarSeries;
 import org.eclipse.swtchart.ICircularSeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -36,16 +37,17 @@ public class TraceLabsPerformanceCountersChartView extends TmfView {
 	
 	private Chart chart;
 	
+	Composite pane;
+	
 	public TraceLabsPerformanceCountersChartView() {
 		super(VIEW_ID);
 	}
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		parent.setLayout(new GridLayout(1, false));
+		pane = parent;
+		// parent.setLayout(new GridLayout(1, false));
 		
-		chart = new Chart(parent, SWT.NONE);
-		chart.getTitle().setText("Performance Counters");
 		
 		TmfTraceManager traceManager = TmfTraceManager.getInstance();
         ITmfTrace trace = traceManager.getActiveTrace();
@@ -107,17 +109,29 @@ public class TraceLabsPerformanceCountersChartView extends TmfView {
 							labels.add(entry.getKey());
 							values.add(entry.getValue().doubleValue());
 						}
-						ICircularSeries<?> circularSeries = (ICircularSeries<?>)chart.getSeriesSet().createSeries(SeriesType.PIE, "counters");
-						String[] labelArray = (String[]) labels.toArray();
+						
+						String[] labelArray = labels.toArray(new String[0]);
 						double[] valueArray = new double[values.size()];
 						
 						for (int i = 0; i < values.size(); i++) {
 							valueArray[i] = (double) values.get(i);
 						}
 						
-						circularSeries.setSeries(labelArray, valueArray);				
+						chart = new Chart(pane, SWT.NONE);
+						chart.getTitle().setText("Performance Counters");
+						chart.getAxisSet().getXAxis(0).getTitle().setText("Performance Counters");
+						chart.getAxisSet().getYAxis(0).getTitle().setText("Count");
 						
-						chart.redraw();
+						chart.getAxisSet().getXAxis(0).enableCategory(true);
+						chart.getAxisSet().getXAxis(0).setCategorySeries(new String[]{});
+						
+						chart.getAxisSet().getXAxis(0).enableCategory(true);
+						chart.getAxisSet().getXAxis(0).setCategorySeries(labelArray);
+						
+						IBarSeries<?> barSeries1 = (IBarSeries<?>) chart.getSeriesSet().createSeries(SeriesType.BAR, "totals");
+						barSeries1.setYSeries(valueArray);
+						
+						chart.getAxisSet().adjustRange();
 					}
 				});
 			}
