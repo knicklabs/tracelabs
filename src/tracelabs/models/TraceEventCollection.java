@@ -63,6 +63,7 @@ public class TraceEventCollection {
 	
 	private List<TraceEvent> events = new ArrayList<TraceEvent>();
 	private List<TraceEventAggregate> aggregateEvents = new ArrayList<TraceEventAggregate>();
+	private PerformanceCounters performanceCounters = new PerformanceCounters();
 	
 	public void aggregate() {		
 		List<String> names = events
@@ -139,6 +140,8 @@ public class TraceEventCollection {
 		} else if (momentPart.equals("exit")) {
 			event.observeExit(timestamp, performanceCounters);
 		}
+		
+		this.performanceCounters.update(timestamp, performanceCounters);
 				
 		if (shouldInsert) {
 			events.add(event);

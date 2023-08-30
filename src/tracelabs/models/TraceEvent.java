@@ -158,8 +158,8 @@ public class TraceEvent {
 	 * @throws InvalidObservation
 	 */
 	public void observeExit(long timestamp, Map<String, Long> performanceCounters) throws InvalidObservation {
-		// Occassionally we get an exit without an entry so we should guard against that.
-		// This seams to always happen on first occurence, i.e. entries = 0, exits = 1, so
+		// Occasionally we get an exit without an entry so we should guard against that.
+		// This seams to always happen on first occurrence, i.e. entries = 0, exits = 1, so
 		// likely this is because an entry happened before the trace started.
 		if (entries.size() - exits.size() != 1) {
 			throw new InvalidObservation("Unmatched exit (count) observed for id: " + id + ", name: " + name + ", entries: " + entries.size() + ", exits: " + (exits.size() + 1));
