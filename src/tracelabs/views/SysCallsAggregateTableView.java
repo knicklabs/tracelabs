@@ -18,7 +18,7 @@ import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.EventTable;
 
 public class SysCallsAggregateTableView extends TmfView {
-	public static final String VIEW_ID = "tracelabs.views.TraceLabsAggregateView";
+	public static final String VIEW_ID = "tracelabs.views.SysCallsAggregateTableView";
 	
 	private ITmfTrace currentTrace;
 	

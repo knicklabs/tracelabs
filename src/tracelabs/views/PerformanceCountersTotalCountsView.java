@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.Chart;
 import org.eclipse.swtchart.IBarSeries;
-import org.eclipse.swtchart.ICircularSeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
@@ -25,7 +23,6 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 import tracelabs.models.TraceEventAggregate;
 import tracelabs.models.TraceEventCollection;
-import tracelabs.ui.PerformanceCountersTable;
 
 public class PerformanceCountersTotalCountsView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.PerformanceCountersTotalCountsView";
@@ -33,11 +30,9 @@ public class PerformanceCountersTotalCountsView extends TmfView {
 	private ITmfTrace currentTrace;
 	
 	private TraceEventCollection collection = new TraceEventCollection();
-	private PerformanceCountersTable table;
 	
 	private Chart chart;
-	
-	Composite pane;
+	private Composite pane;
 	
 	public PerformanceCountersTotalCountsView() {
 		super(VIEW_ID);
@@ -45,9 +40,7 @@ public class PerformanceCountersTotalCountsView extends TmfView {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		pane = parent;
-		// parent.setLayout(new GridLayout(1, false));
-		
+		pane = parent;		
 		
 		TmfTraceManager traceManager = TmfTraceManager.getInstance();
         ITmfTrace trace = traceManager.getActiveTrace();

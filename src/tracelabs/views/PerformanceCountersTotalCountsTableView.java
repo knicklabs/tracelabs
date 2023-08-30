@@ -18,7 +18,7 @@ import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.PerformanceCountersTable;
 
 public class PerformanceCountersTotalCountsTableView extends TmfView {
-	public static final String VIEW_ID = "tracelabs.views.TraceLabsPerformanceCountersView";
+	public static final String VIEW_ID = "tracelabs.views.PerformanceCountersTotalCountsTableView";
 	
 	private ITmfTrace currentTrace;
 	
