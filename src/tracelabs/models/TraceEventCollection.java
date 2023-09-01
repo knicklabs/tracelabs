@@ -13,7 +13,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import tracelabs.models.TraceEvent.InvalidObservation;
-import tracelabs.models.TraceEvent.PartType;
 
 public class TraceEventCollection {
 	class PartType {

@@ -20,7 +20,7 @@ Note: Eclipse Marketplace can be accessed from `Help > Eclipse Marketplace` in t
 4. From the file explorer, choose the `tracelabs` directory copied to your computer in step one.
 5. Click the `Finish` button in the `Import Projects from File System or Archive` modal window.
 
-### Run in Development
+### Running the Plug-In
 
 1. Click the `Run` button in the Eclipse toolbar and if prompted, select `Eclipse Application` for `Run As`.
 2. From the new Eclipse window that opens, select `Window > Perspective > Open Perspective > Other` from the application menu.
@@ -33,12 +33,11 @@ Note: Eclipse Marketplace can be accessed from `Help > Eclipse Marketplace` in t
 9. From the `Project Explorer`, select a Kernel trace from the trace that you just imported into `Trace Labs Dev`.
 10. If prompted in the `Confirm Perspective Switch` to open the `LTTng Kernel perspective`, click the `Yes` button.
 11. Select `Window > Show View > Other` from the application menu.
-12. From the `Show View` modal window, select `TraceLabs Aggregate SysCall Stats`, `TraceLabs Performance Counters`, `TraceLabs Performance Counters Chart`, and `TraceLabs SysCall Stats`.
+12. From the `Show View` modal window, open the `TraceLabs` folder and select `Performance Counters - Growth Viz`, `Performance Counters - Total Table`, `Performance Counters - Total Viz`, `SysCalls - Aggregated Table`, and `SysCalls - Table`.
 
 After following all those steps, you should be able to see all of the views under development in the Trace Labs project.
 
-
-## Collecting Traces
+### Collecting Compatible Traces
 
 To collect traces compatible with this plug-in, you will need to run a program such as LTTng or Perf on a compatible Linux operating system. You will need to collect syscall events with fields for process id, thread id, and one or more performance counters. The resulting trace must be in Common Trace Format (CTF).
 
@@ -53,3 +52,9 @@ Here's an example script for using LTTng to trace syscall events on the Linux ke
 7. Run `lttng destroy` to stop tracing, destroy the tracing session, and write the results to disk in Common Trace Format (CTF).
 
 Note: you can see all of the context that you can add to an event by running `lttng add-context --list`, this includes all performance counters. You cannot add context for more than four performance counters at a time.
+
+## Packages
+
+- `tracelabs.models`: classes for modeling trace events and collections of trace events.
+- `tracelabs.ui`: Small user interface components used within views.
+- `tracelabs.views`: Complete user interfaces. Each class corresponds to a single view within the plug-in.
