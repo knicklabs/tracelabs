@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Models a trace event.
+ */
 public class TraceEvent {
 	/**
 	 * An error thrown on an invalid observation.
 	 */
-	class InvalidObservation extends Exception {
+	public class InvalidObservation extends Exception {
 		private static final long serialVersionUID = 1L;
 
 		public InvalidObservation(String message) {
@@ -16,10 +19,7 @@ public class TraceEvent {
 		}
 	}
 	
-	/**
-	 * An Observation of a TraceEvent.
-	 */
-	class Observation {
+	private class Observation {
 		private Map<String, Long> performanceCounters;
 		private long timestamp;
 		
@@ -37,26 +37,16 @@ public class TraceEvent {
 		}
 	}
 	
-	/** The event (process or thread) id. */
 	private long id;
-	
-	/** The event name. */
 	private String name;
-	
-	/** The durations of each occurrence of this event. */
 	private List<Long> durations = new ArrayList<Long>();
-	
-	/** Each observed entry of this event. */
 	private List<Observation> entries = new ArrayList<Observation>();
-	
-	/** Each observed exit of this event. */
 	private List<Observation> exits = new ArrayList<Observation>();
 	
 	/**
 	 * Create a new instance of the TraceEvent.
-	 * 
-	 * @param id	The (process or thread) id of the event.
-	 * @param name  The name of the event.
+	 * @param id
+	 * @param name
 	 */
 	public TraceEvent(long id, String name) {
 		this.id = id;
@@ -65,8 +55,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the number of times this event was observed.
-	 * 
-	 * @return 	The number of times the event was observed.
+	 * @return
 	 */
 	public int numObservations() {
 		return durations.size();
@@ -74,8 +63,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the average duration of an observed instance of this event.
-	 * 
-	 * @return 	The average duration.
+	 * @return
 	 */
 	public long averageDuration() {
 		int count = durations.size();
@@ -90,8 +78,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the sum of each duration of each observed instance of this event.
-	 * 
-	 * @return	The total duration.
+	 * @return
 	 */
 	public long totalDuration() {
 		long result = 0;
@@ -105,8 +92,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the last observed entry from this event.
-	 * 
-	 * @return	The last observed entry.
+	 * @return
 	 */
 	public long lastEntry() {
 		return this.entries.get(this.entries.size() - 1).getTimestamp();
@@ -114,8 +100,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the last observed exit from this event.
-	 * 
-	 * @return	The last observed exit.
+	 * @return
 	 */
 	public long lastExit() {
 		return this.exits.get(this.exits.size() - 1).getTimestamp();
@@ -123,8 +108,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the last observed performance counters on entry from this event.
-	 * 
-	 * @return The last observed performance counters.
+	 * @return
 	 */
 	public Map<String, Long> lastPerformanceCountersOnEntry() {
 		return this.entries.get(this.entries.size() - 1).getPerformanceCounters();
@@ -132,8 +116,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the last observed performance counters on exit from this event.
-	 * 
-	 * @return The last observed performance counters.
+	 * @return
 	 */
 	public Map<String, Long> lastPerformanceCountersOnExit() {
 		return this.exits.get(this.exits.size() - 1).getPerformanceCounters();
@@ -141,9 +124,8 @@ public class TraceEvent {
 	
 	/**
 	 * Observe an entry of this event.
-	 * 
-	 * @param timestamp	The timestamp of entry.
-	 * @param performanceCounters The performance counters recorded at entry.
+	 * @param timestamp
+	 * @param performanceCounters
 	 */
 	public void observeEntry(long timestamp, Map<String, Long> performanceCounters) {
 		entries.add(new Observation(timestamp, performanceCounters));
@@ -151,9 +133,8 @@ public class TraceEvent {
 	
 	/**
 	 * Observe an exit of this event. This also computes a duration.
-	 * 
-	 * @param timestamp	The timestamp of exit.
-	 * @param performanceCounters The performance counters recorded at exit.
+	 * @param timestamp
+	 * @param performanceCounters
 	 * @throws InvalidObservation
 	 */
 	public void observeExit(long timestamp, Map<String, Long> performanceCounters) throws InvalidObservation {
@@ -173,9 +154,8 @@ public class TraceEvent {
 	}
 	
 	/**
-	 * Get the (process or thread) id of the event.
-	 * 
-	 * @return The event id.
+	 * Get the thread id of the event.
+	 * @return
 	 */
 	public long getId() {
 		return id;
@@ -183,8 +163,7 @@ public class TraceEvent {
 	
 	/**
 	 * Get the name of the event.
-	 * 
-	 * @return The event name.
+	 * @return
 	 */
 	public String getName() {
 		return name;

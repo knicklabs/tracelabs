@@ -23,6 +23,9 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import tracelabs.models.PerformanceCounters;
 import tracelabs.models.TraceEventCollection;
 
+/**
+ * A view that shows the growth of performance counters over the span of the trace.
+ */
 public class PerformanceCountersGrowthView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.PerformanceCountersGrowthView";
 	

@@ -17,6 +17,9 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import tracelabs.models.TraceEventCollection;
 import tracelabs.ui.EventTable;
 
+/**
+ *  A view that shows aggregated syscall events in a tabular format.
+ */
 public class SysCallsAggregateTableView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.SysCallsAggregateTableView";
 	

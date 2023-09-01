@@ -29,7 +29,7 @@ public class PerformanceCountersTable {
 	private static final int COLUMN_NAME = 0;
 	private static final int COLUMN_COUNT = 1;
 	
-	public class Row {
+	private class Row {
 		private long count = 0;
 		private String name = "";
 		
@@ -50,7 +50,7 @@ public class PerformanceCountersTable {
 		}
 	}
 	
-	public class RowComparator implements Comparator<Row> {
+	private class RowComparator implements Comparator<Row> {
 		private static final int ASCENDING = 0;
 		private static final int DESCENDING = 1;
 		
@@ -129,6 +129,10 @@ public class PerformanceCountersTable {
 	private TableViewer tableViewer;
 	private Table table;
 	
+	/**
+	 * Create a table of performance counters.
+	 * @param parent
+	 */
 	public void createTable(Composite parent) {
 		tableViewer = new TableViewer(parent);
 		tableViewer.setLabelProvider(new ColumnLabelProvider());
@@ -163,6 +167,9 @@ public class PerformanceCountersTable {
 		table.setLinesVisible(true);
 	}
 	
+	/**
+	 * Update the table of performance counters.
+	 */
 	public void updateTable() {
 		tableViewer.setInput(rows);
 		
@@ -174,6 +181,10 @@ public class PerformanceCountersTable {
 		tableViewer.refresh();
 	}
 	
+	/**
+	 * Update the table of performance counters with fresh data.
+	 * @param collection
+	 */
 	public void updateTable(TraceEventCollection collection) {
 		rows.clear();
 		collection.aggregate();

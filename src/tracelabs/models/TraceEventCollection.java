@@ -14,8 +14,11 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import tracelabs.models.TraceEvent.InvalidObservation;
 
+/**
+ * Models a collection of trace events. Only syscall events.
+ */
 public class TraceEventCollection {
-	class PartType {
+	private class PartType {
 		public static final String TYPE_LABEL = "type";		
 		public static final String MOMENT_LABEL = "moment";
 		public static final String NAME_LABEL = "name";
@@ -64,6 +67,10 @@ public class TraceEventCollection {
 	private List<TraceEventAggregate> aggregateEvents = new ArrayList<TraceEventAggregate>();
 	private PerformanceCounters performanceCounters = new PerformanceCounters();
 	
+	/**
+	 * Aggregate the events by folding events of the same name on different threads into 
+	 * a single event.
+	 */
 	public void aggregate() {		
 		List<String> names = events
 				.stream()
@@ -80,18 +87,36 @@ public class TraceEventCollection {
 		}
 	}
 	
+	/**
+	 * Get the aggregated events.
+	 * @return
+	 */
 	public List<TraceEventAggregate> getAggregateEvents() {
 		return aggregateEvents;
 	}
 	
+	/**
+	 * Get the events.
+	 * @return
+	 */
 	public List<TraceEvent> getEvents() {
 		return events;
 	}
 	
+	/**
+	 * Get the performance counters captured on each event.
+	 * @return
+	 */
 	public PerformanceCounters getPerformanceCounters() {
 		return performanceCounters;
 	}
 	
+	/**
+	 * Process a raw trace event by creating a TraceEvent and adding it 
+	 * to the collection.
+	 * @param rawEvent
+	 * @throws InvalidObservation
+	 */
 	public void process(ITmfEvent rawEvent) throws InvalidObservation {		
 		String[] parts = splitNameIntoParts(rawEvent.getName());
 		if (!isValid(parts)) {
@@ -151,6 +176,9 @@ public class TraceEventCollection {
 		}
 	}
 	
+	/**
+	 * Reset the collection.
+	 */
 	public void reset() {
 		aggregateEvents.clear();
 		events.clear();

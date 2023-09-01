@@ -24,6 +24,9 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import tracelabs.models.TraceEventAggregate;
 import tracelabs.models.TraceEventCollection;
 
+/**
+ * A view that shows performance counter counts in graphical format.
+ */
 public class PerformanceCountersTotalCountsView extends TmfView {
 	public static final String VIEW_ID = "tracelabs.views.PerformanceCountersTotalCountsView";
 	

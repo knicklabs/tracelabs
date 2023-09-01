@@ -30,7 +30,7 @@ public class EventTable {
 	private static final int COLUMN_AVERAGE_DURATION = 3;
 	private static final int COLUMN_TOTAL_DURATION = 4;
 	
-	public class Row {
+	private class Row {
 		private long id = -1;
 		private String name = "";
 		private int numCalls = 0;
@@ -78,7 +78,7 @@ public class EventTable {
 		}
 	}
 	
-	public class RowComparator implements Comparator<Row> {		
+	private class RowComparator implements Comparator<Row> {		
 		private static final int ASCENDING = 0;
 		private static final int DESCENDING = 1;
 		
@@ -176,10 +176,17 @@ public class EventTable {
 		public void inputChanged(Viewer viewer, Object previousInput, Object nextInput) {}
 	}
 	
+	/**
+	 * Create an event table instance.
+	 * @param includeId
+	 */
 	public EventTable(boolean includeId) {
 		this.includeId = includeId;
 	}
 	
+	/**
+	 * Create the table of events.
+	 */
 	public void createTable(Composite parent) {		
 		tableViewer = new TableViewer(parent);
 		tableViewer.setLabelProvider(new ColumnLabelProvider());
@@ -248,6 +255,9 @@ public class EventTable {
 		table.setLinesVisible(true);
 	}
 	
+	/**
+	 * Update the table of events.
+	 */
 	public void updateTable() {
 		tableViewer.setInput(rows);
 		
@@ -259,6 +269,10 @@ public class EventTable {
 		tableViewer.refresh();
 	}
 	
+	/**
+	 * Update the table of events with fresh data.
+	 * @param collection
+	 */
 	public void updateTable(TraceEventCollection collection) {
 		rows.clear();
 		
