@@ -2,6 +2,8 @@
 
 Trace Labs is a Trace Compass plugin that can be used to perform analysis on system calls and performance counters.
 
+> This is a school project completed for COSC 3P99 at Brock University. See the [report](./report/report.md) for more details about that.
+
 ## Getting Started
 
 ### Prerequisites
